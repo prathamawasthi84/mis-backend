@@ -20,9 +20,11 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final EmailVerifiactionTokenRespository emailVerifiactionTokenRespository;
+    private final EmailService emailService;
 
-    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,UserMapper userMapper,EmailVerifiactionTokenRespository emailVerifiactionTokenRespository){
+    public UserService(UserRepository userRepository,EmailService emailService,PasswordEncoder passwordEncoder,UserMapper userMapper,EmailVerifiactionTokenRespository emailVerifiactionTokenRespository){
         this.userMapper=userMapper;
+        this.emailService=emailService;
         this.userRepository=userRepository;
         this.passwordEncoder=passwordEncoder;
         this.emailVerifiactionTokenRespository = emailVerifiactionTokenRespository;
@@ -41,6 +43,7 @@ public class UserService {
         emailVerificationToken.setUserEntity(userEntity);
         emailVerificationToken.setExpiresAt(LocalDateTime.now().plusHours(24));
         emailVerifiactionTokenRespository.save(emailVerificationToken);
+        emailService.sendVerificationMail(userEntity.getEmail(),token);
         return userRepository.save(userEntity);
     }
 }

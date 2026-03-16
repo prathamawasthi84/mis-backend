@@ -1,6 +1,7 @@
 package com.example.MIS.and.Invoicing.System.userregistration.login.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.engine.internal.Cascade;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +13,7 @@ public class EmailVerificationToken{
     Integer tokenId;
     String token;
     LocalDateTime expiresAt;
-    @OneToOne
+    @OneToOne( cascade = CascadeType.ALL)
     @JoinColumn(name="user_id")
     public UserEntity userEntity;
 
