@@ -7,10 +7,7 @@ import com.example.MIS.and.Invoicing.System.userregistration.login.service.UserS
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -26,9 +23,9 @@ public class UserController {
         userService.saveUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
-    @PostMapping("/user/verify")
-    public ResponseEntity<String> verifyEmail(@RequestBody String token){
-        String result = emailService.verifyEmail(token);
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam String token){
+        String result = userService.verifyEmail(token);
         return ResponseEntity.ok(result);
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,17 +34,37 @@ public class UserService {
         if(userRepository.existsByEmail(userDTO.getEmail())){
             throw new RuntimeException("Email already exists");
         }
+
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
-        UserEntity userEntity  = userMapper.toEntity(userDTO,encodedPassword);
+        UserEntity userEntity = userMapper.toEntity(userDTO, encodedPassword);
         userEntity.setRole("USER");
         userEntity.setStatus(Status.PENDING);
+
+        UserEntity savedUser = userRepository.save(userEntity);
+
         String token = UUID.randomUUID().toString();
         EmailVerificationToken emailVerificationToken = new EmailVerificationToken();
         emailVerificationToken.setToken(token);
-        emailVerificationToken.setUserEntity(userEntity);
+        emailVerificationToken.setUserEntity(savedUser);
         emailVerificationToken.setExpiresAt(LocalDateTime.now().plusHours(24));
         emailVerifiactionTokenRespository.save(emailVerificationToken);
-        emailService.sendVerificationMail(userEntity.getEmail(),token);
-        return userRepository.save(userEntity);
+
+        emailService.sendVerificationMail(savedUser.getEmail(), token);
+
+        return savedUser;
+    }
+    public String verifyEmail(String token) {
+        Optional<EmailVerificationToken> output = emailVerifiactionTokenRespository.findByToken(token);
+        if (output.isEmpty()) {
+            throw new RuntimeException("Invalid Token");
+        }
+        EmailVerificationToken emailVerificationToken = output.get();
+        if (emailVerificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Token Expired");
+        }
+        UserEntity userEntity = emailVerificationToken.getUserEntity();
+        userEntity.setStatus(Status.ACTIVE);
+        userRepository.save(userEntity);
+        return "Email Verified Successfully";
     }
 }

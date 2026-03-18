@@ -33,18 +33,4 @@ public class EmailService {
         simpleMailMessage.setText("Click the link to verify: " + link);
         javaMailSender.send(simpleMailMessage);
     }
-    public String verifyEmail(String token){
-        Optional<EmailVerificationToken> output = emailVerifiactionTokenRespository.findByToken(token);
-        if(output.isEmpty()){
-            throw new RuntimeException("Invalid Token");
-        }
-        EmailVerificationToken emailVerificationToken = output.get();
-        if(emailVerificationToken.getExpiresAt().isBefore(LocalDateTime.now())){
-            throw new RuntimeException("Token Expired");
-        }
-        UserEntity userEntity = emailVerificationToken.getUserEntity();
-        userEntity.setStatus(Status.ACTIVE);
-        userRepository.save(userEntity);
-        return "Email Verified Successfully";
-    }
 }
