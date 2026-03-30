@@ -1,7 +1,9 @@
 package com.example.MIS.and.Invoicing.System.userregistration.login.service;
 
+import com.example.MIS.and.Invoicing.System.jwt.JwtUtil;
 import com.example.MIS.and.Invoicing.System.userregistration.login.Status;
 import com.example.MIS.and.Invoicing.System.userregistration.login.config.SecurityConfig;
+import com.example.MIS.and.Invoicing.System.userregistration.login.dto.LoginInDTO;
 import com.example.MIS.and.Invoicing.System.userregistration.login.dto.UserDTO;
 import com.example.MIS.and.Invoicing.System.userregistration.login.entity.EmailVerificationToken;
 import com.example.MIS.and.Invoicing.System.userregistration.login.entity.UserEntity;
@@ -19,20 +21,23 @@ import java.util.UUID;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final EmailVerifiactionTokenRespository emailVerifiactionTokenRespository;
     private final EmailService emailService;
 
-    public UserService(UserRepository userRepository,EmailService emailService,PasswordEncoder passwordEncoder,UserMapper userMapper,EmailVerifiactionTokenRespository emailVerifiactionTokenRespository){
-        this.userMapper=userMapper;
-        this.emailService=emailService;
-        this.userRepository=userRepository;
-        this.passwordEncoder=passwordEncoder;
+    public UserService(UserRepository userRepository, JwtUtil jwtUtil, EmailService emailService, PasswordEncoder passwordEncoder, UserMapper userMapper, EmailVerifiactionTokenRespository emailVerifiactionTokenRespository) {
+        this.userMapper = userMapper;
+        this.jwtUtil = jwtUtil;
+        this.emailService = emailService;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
         this.emailVerifiactionTokenRespository = emailVerifiactionTokenRespository;
     }
-    public UserEntity saveUser(UserDTO userDTO){
-        if(userRepository.existsByEmail(userDTO.getEmail())){
+
+    public UserEntity saveUser(UserDTO userDTO) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
 
@@ -54,16 +59,18 @@ public class UserService {
 
         return savedUser;
     }
-    public UserEntity saveUserByAdmin(UserDTO userDTO){
-        if(userRepository.existsByEmail(userDTO.getEmail())){
+
+    public UserEntity saveUserByAdmin(UserDTO userDTO) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
-        UserEntity userEntity = userMapper.toEntity(userDTO,encodedPassword);
+        UserEntity userEntity = userMapper.toEntity(userDTO, encodedPassword);
         userEntity.setRole(userDTO.getRole());
         userEntity.setStatus(Status.ACTIVE);
         return userRepository.save(userEntity);
     }
+
     public String verifyEmail(String token) {
         Optional<EmailVerificationToken> output = emailVerifiactionTokenRespository.findByToken(token);
         if (output.isEmpty()) {
@@ -77,5 +84,17 @@ public class UserService {
         userEntity.setStatus(Status.ACTIVE);
         userRepository.save(userEntity);
         return "Email Verified Successfully";
+    }
+
+    public String Login(LoginInDTO loginInDTO) {
+        UserEntity userEntity = userRepository.findByEmail(loginInDTO.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (userEntity.getStatus() != Status.ACTIVE) {
+            throw new RuntimeException("Please Verify Email First");
+        }
+        if (!passwordEncoder.matches(loginInDTO.getPassword(), userEntity.getPasswordHash())) {
+            throw new RuntimeException("Invalid password");
+        }
+        return jwtUtil.generateToken(userEntity.getEmail(), userEntity.getRole());
     }
 }
