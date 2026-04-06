@@ -7,7 +7,9 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 
@@ -17,7 +19,7 @@ public class JwtUtil {
     private String secretKey;
 
     @Value("${jwt.expiration}")
-    private String expriation;
+    private Long expriation;
 
     public String generateToken(String email,String role){
         return Jwts.builder()
@@ -25,7 +27,7 @@ public class JwtUtil {
                 .claim("role",role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis()+expriation))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(getSigningKey())
                 .compact();
     }
     private Key getSigningKey(){
@@ -34,10 +36,10 @@ public class JwtUtil {
     }
     private Claims getClaims(String token){
         return Jwts.parser()
-                .setSigningKey(getSigningKey())
+                .verifyWith((SecretKey) getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
     public String extractEmail(String token){
        return getClaims(token).getSubject();

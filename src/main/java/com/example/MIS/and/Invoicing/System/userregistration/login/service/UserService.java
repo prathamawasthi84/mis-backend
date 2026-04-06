@@ -1,15 +1,18 @@
 package com.example.MIS.and.Invoicing.System.userregistration.login.service;
 
 import com.example.MIS.and.Invoicing.System.jwt.JwtUtil;
+import com.example.MIS.and.Invoicing.System.userregistration.login.SessionStatus;
 import com.example.MIS.and.Invoicing.System.userregistration.login.Status;
 import com.example.MIS.and.Invoicing.System.userregistration.login.config.SecurityConfig;
 import com.example.MIS.and.Invoicing.System.userregistration.login.dto.LoginInDTO;
 import com.example.MIS.and.Invoicing.System.userregistration.login.dto.UserDTO;
 import com.example.MIS.and.Invoicing.System.userregistration.login.entity.EmailVerificationToken;
 import com.example.MIS.and.Invoicing.System.userregistration.login.entity.UserEntity;
+import com.example.MIS.and.Invoicing.System.userregistration.login.entity.UserSession;
 import com.example.MIS.and.Invoicing.System.userregistration.login.mapper.UserMapper;
 import com.example.MIS.and.Invoicing.System.userregistration.login.repository.EmailVerifiactionTokenRespository;
 import com.example.MIS.and.Invoicing.System.userregistration.login.repository.UserRepository;
+import com.example.MIS.and.Invoicing.System.userregistration.login.repository.UserSessionRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,9 +29,11 @@ public class UserService {
     private final UserMapper userMapper;
     private final EmailVerifiactionTokenRespository emailVerifiactionTokenRespository;
     private final EmailService emailService;
+    private final UserSessionRepository userSessionRepository;
 
-    public UserService(UserRepository userRepository, JwtUtil jwtUtil, EmailService emailService, PasswordEncoder passwordEncoder, UserMapper userMapper, EmailVerifiactionTokenRespository emailVerifiactionTokenRespository) {
+    public UserService(UserSessionRepository userSessionRepository,UserRepository userRepository, JwtUtil jwtUtil, EmailService emailService, PasswordEncoder passwordEncoder, UserMapper userMapper, EmailVerifiactionTokenRespository emailVerifiactionTokenRespository) {
         this.userMapper = userMapper;
+        this.userSessionRepository=userSessionRepository;
         this.jwtUtil = jwtUtil;
         this.emailService = emailService;
         this.userRepository = userRepository;
@@ -95,6 +100,16 @@ public class UserService {
         if (!passwordEncoder.matches(loginInDTO.getPassword(), userEntity.getPasswordHash())) {
             throw new RuntimeException("Invalid password");
         }
-        return jwtUtil.generateToken(userEntity.getEmail(), userEntity.getRole());
+        String token=  jwtUtil.generateToken(userEntity.getEmail(), userEntity.getRole());
+        UserSession session = new UserSession();
+        session.setToken(token);
+        session.setUserEntity(userEntity);
+        session.setSessionStatus(SessionStatus.ACTIVE);
+        session.setCreatedAt(LocalDateTime.now());
+        session.setExpiresAt(LocalDateTime.now().plusHours(24));
+
+        userSessionRepository.save(session);
+
+        return token;
     }
 }

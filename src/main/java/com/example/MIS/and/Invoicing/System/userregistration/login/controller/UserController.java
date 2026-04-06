@@ -1,5 +1,6 @@
 package com.example.MIS.and.Invoicing.System.userregistration.login.controller;
 
+import com.example.MIS.and.Invoicing.System.userregistration.login.dto.LoginInDTO;
 import com.example.MIS.and.Invoicing.System.userregistration.login.dto.UserDTO;
 import com.example.MIS.and.Invoicing.System.userregistration.login.entity.UserEntity;
 import com.example.MIS.and.Invoicing.System.userregistration.login.service.EmailService;
@@ -27,5 +28,10 @@ public class UserController {
     public ResponseEntity<String> verifyEmail(@RequestParam String token){
         String result = userService.verifyEmail(token);
         return ResponseEntity.ok(result);
+    }
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginInDTO loginDTO) {
+        String token = userService.Login(loginDTO);
+        return ResponseEntity.ok(token);
     }
 }
