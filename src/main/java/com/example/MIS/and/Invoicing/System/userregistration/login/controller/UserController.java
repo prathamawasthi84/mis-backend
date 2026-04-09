@@ -5,6 +5,7 @@ import com.example.MIS.and.Invoicing.System.userregistration.login.dto.UserDTO;
 import com.example.MIS.and.Invoicing.System.userregistration.login.entity.UserEntity;
 import com.example.MIS.and.Invoicing.System.userregistration.login.service.EmailService;
 import com.example.MIS.and.Invoicing.System.userregistration.login.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +34,13 @@ public class UserController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginInDTO loginDTO) {
         String token = userService.Login(loginDTO);
         return ResponseEntity.ok(token);
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        System.out.println("Logout hit!");
+        String token = authHeader.substring(7); // remove "Bearer "
+        String result = userService.logout(token);
+        return ResponseEntity.ok(result);
     }
 }

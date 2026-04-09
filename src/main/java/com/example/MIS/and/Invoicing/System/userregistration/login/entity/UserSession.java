@@ -13,11 +13,14 @@ public class UserSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer sessionId;
+    @Column(name = "token", length = 512)
     private String token;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "session_status")
     private SessionStatus sessionStatus;
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
 

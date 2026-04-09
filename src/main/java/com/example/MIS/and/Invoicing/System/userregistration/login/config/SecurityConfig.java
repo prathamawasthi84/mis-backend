@@ -38,9 +38,8 @@ public class SecurityConfig {
        http
                .csrf(csrf -> csrf.disable())
                .userDetailsService(userDetailsService)
-               .httpBasic(Customizer.withDefaults())
                .authorizeHttpRequests(auth->auth
-                       .requestMatchers("/user/register","/user/verify","/user/login","/admin/add-user").permitAll()
+                       .requestMatchers("/user/register","/user/verify","/user/login","/user/logout").permitAll()
                        .requestMatchers(("/admin/**")).hasAuthority("ADMIN")
                        .requestMatchers("/error").permitAll()
                        .anyRequest().authenticated())

@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -92,7 +93,8 @@ public class UserService {
     }
 
     public String Login(LoginInDTO loginInDTO) {
-        UserEntity userEntity = userRepository.findByEmail(loginInDTO.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        UserEntity userEntity = userRepository.findByEmail(loginInDTO.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (userEntity.getStatus() != Status.ACTIVE) {
             throw new RuntimeException("Please Verify Email First");
@@ -100,16 +102,36 @@ public class UserService {
         if (!passwordEncoder.matches(loginInDTO.getPassword(), userEntity.getPasswordHash())) {
             throw new RuntimeException("Invalid password");
         }
-        String token=  jwtUtil.generateToken(userEntity.getEmail(), userEntity.getRole());
+
+        // Invalidate any existing active session before creating a new one
+        userSessionRepository.findByUserEntityAndSessionStatus(userEntity, SessionStatus.ACTIVE)
+                .ifPresent(existing -> {
+                    existing.setSessionStatus(SessionStatus.INACTIVE);
+                    userSessionRepository.save(existing);
+                });
+
+        String token = jwtUtil.generateToken(userEntity.getEmail(), userEntity.getRole());
         UserSession session = new UserSession();
         session.setToken(token);
         session.setUserEntity(userEntity);
         session.setSessionStatus(SessionStatus.ACTIVE);
         session.setCreatedAt(LocalDateTime.now());
         session.setExpiresAt(LocalDateTime.now().plusHours(24));
-
         userSessionRepository.save(session);
 
         return token;
+    }
+
+    public String logout(String token) {
+        System.out.println("Logout token: [" + token + "]");
+
+        // Also print what's in DB
+        userSessionRepository.findAll()
+                .forEach(s -> System.out.println("DB token: [" + s.getToken() + "]"));
+        UserSession session = userSessionRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Session not found"));
+        session.setSessionStatus(SessionStatus.INACTIVE);
+        userSessionRepository.save(session);
+        return "Logged out successfully";
     }
 }
