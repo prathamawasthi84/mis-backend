@@ -33,4 +33,13 @@ public class EmailService {
         simpleMailMessage.setText("Click the link to verify: " + link);
         javaMailSender.send(simpleMailMessage);
     }
+    public void sendPasswordResetMail(String toEmail, String token) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Password Reset Request");
+        message.setText("Your password reset token: " + token +
+                "\nThis token expires in 15 minutes." +
+                "\nUse POST /user/reset-password to reset your password.");
+        javaMailSender.send(message);
+    }
 }

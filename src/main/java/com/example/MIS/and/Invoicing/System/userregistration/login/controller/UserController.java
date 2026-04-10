@@ -43,4 +43,15 @@ public class UserController {
         String result = userService.logout(token);
         return ResponseEntity.ok(result);
     }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        String result = userService.forgotPassword(email);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+        String result = userService.resetPassword(token, newPassword);
+        return ResponseEntity.ok(result);
+    }
 }

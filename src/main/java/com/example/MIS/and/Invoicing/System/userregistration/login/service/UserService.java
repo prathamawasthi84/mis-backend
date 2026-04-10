@@ -7,10 +7,12 @@ import com.example.MIS.and.Invoicing.System.userregistration.login.config.Securi
 import com.example.MIS.and.Invoicing.System.userregistration.login.dto.LoginInDTO;
 import com.example.MIS.and.Invoicing.System.userregistration.login.dto.UserDTO;
 import com.example.MIS.and.Invoicing.System.userregistration.login.entity.EmailVerificationToken;
+import com.example.MIS.and.Invoicing.System.userregistration.login.entity.PasswordResetToken;
 import com.example.MIS.and.Invoicing.System.userregistration.login.entity.UserEntity;
 import com.example.MIS.and.Invoicing.System.userregistration.login.entity.UserSession;
 import com.example.MIS.and.Invoicing.System.userregistration.login.mapper.UserMapper;
 import com.example.MIS.and.Invoicing.System.userregistration.login.repository.EmailVerifiactionTokenRespository;
+import com.example.MIS.and.Invoicing.System.userregistration.login.repository.PasswordResetTokenRepository;
 import com.example.MIS.and.Invoicing.System.userregistration.login.repository.UserRepository;
 import com.example.MIS.and.Invoicing.System.userregistration.login.repository.UserSessionRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,9 +33,10 @@ public class UserService {
     private final EmailVerifiactionTokenRespository emailVerifiactionTokenRespository;
     private final EmailService emailService;
     private final UserSessionRepository userSessionRepository;
-
-    public UserService(UserSessionRepository userSessionRepository,UserRepository userRepository, JwtUtil jwtUtil, EmailService emailService, PasswordEncoder passwordEncoder, UserMapper userMapper, EmailVerifiactionTokenRespository emailVerifiactionTokenRespository) {
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    public UserService(PasswordResetTokenRepository passwordResetTokenRepository,UserSessionRepository userSessionRepository,UserRepository userRepository, JwtUtil jwtUtil, EmailService emailService, PasswordEncoder passwordEncoder, UserMapper userMapper, EmailVerifiactionTokenRespository emailVerifiactionTokenRespository) {
         this.userMapper = userMapper;
+        this.passwordResetTokenRepository=passwordResetTokenRepository;
         this.userSessionRepository=userSessionRepository;
         this.jwtUtil = jwtUtil;
         this.emailService = emailService;
@@ -133,5 +136,38 @@ public class UserService {
         session.setSessionStatus(SessionStatus.INACTIVE);
         userSessionRepository.save(session);
         return "Logged out successfully";
+    }
+    // forgot password
+    public String forgotPassword(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setUserEntity(user);
+        resetToken.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+        resetToken.setUsed(false);
+        passwordResetTokenRepository.save(resetToken);
+
+        emailService.sendPasswordResetMail(user.getEmail(), token);
+        return "Password reset email sent";
+    }
+
+    // reset password
+    public String resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid token"));
+
+        if (resetToken.isUsed()) throw new RuntimeException("Token already used");
+        if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) throw new RuntimeException("Token expired");
+
+        UserEntity user = resetToken.getUserEntity();
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        resetToken.setUsed(true);
+        passwordResetTokenRepository.save(resetToken);
+        return "Password reset successfully";
     }
 }
