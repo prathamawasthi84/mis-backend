@@ -37,9 +37,10 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Password Reset Request");
-        message.setText("Your password reset token: " + token +
-                "\nThis token expires in 15 minutes." +
-                "\nUse POST /user/reset-password to reset your password.");
+        message.setText("Click the link below to reset your password:\n\n"
+                + "http://localhost:3000/reset-password/" + token
+                + "\n\nThis link expires in 15 minutes."
+                + "\n\nIf you did not request this, please ignore this email.");
         javaMailSender.send(message);
     }
 }
