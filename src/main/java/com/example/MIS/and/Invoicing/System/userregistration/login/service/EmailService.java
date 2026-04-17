@@ -1,0 +1,46 @@
+package com.example.MIS.and.Invoicing.System.userregistration.login.service;
+
+import com.example.MIS.and.Invoicing.System.userregistration.login.Status;
+import com.example.MIS.and.Invoicing.System.userregistration.login.entity.EmailVerificationToken;
+import com.example.MIS.and.Invoicing.System.userregistration.login.entity.UserEntity;
+import com.example.MIS.and.Invoicing.System.userregistration.login.repository.EmailVerifiactionTokenRespository;
+import com.example.MIS.and.Invoicing.System.userregistration.login.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+@Service
+public class EmailService {
+    @Autowired
+    private JavaMailSender javaMailSender;
+    private EmailVerifiactionTokenRespository emailVerifiactionTokenRespository;
+    private UserRepository userRepository;
+    public EmailService (EmailVerifiactionTokenRespository emailVerifiactionTokenRespository,UserRepository userRepository){
+        this.emailVerifiactionTokenRespository=emailVerifiactionTokenRespository;
+        this.userRepository=userRepository;
+    }
+    public void sendVerificationMail(String toEmail,String token){
+        String link = "http://localhost:8080/user/verify?token=" + token;
+        SimpleMailMessage simpleMailMessage= new SimpleMailMessage();
+        simpleMailMessage.setFrom("noob46966@gmail.com");
+        simpleMailMessage.setTo(toEmail);
+        simpleMailMessage.setSubject("Verify your Email");
+        simpleMailMessage.setText("Click the link to verify: " + link);
+        javaMailSender.send(simpleMailMessage);
+    }
+    public void sendPasswordResetMail(String toEmail, String token) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Password Reset Request");
+        message.setText("Click the link below to reset your password:\n\n"
+                + "http://localhost:3000/reset-password/" + token
+                + "\n\nThis link expires in 15 minutes."
+                + "\n\nIf you did not request this, please ignore this email.");
+        javaMailSender.send(message);
+    }
+}
