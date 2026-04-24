@@ -22,8 +22,13 @@ public class UserController {
     }
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserDTO userDTO){
-        userService.saveUser(userDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+        try {
+            userService.saveUser(userDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
     @GetMapping("/verify")
     public ResponseEntity<String> verifyEmail(@RequestParam String token){
