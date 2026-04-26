@@ -5,19 +5,19 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "chains")
-public class ChainEntity {
+@Table(name = "brands")
+public class BrandEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer chainId;
+    private Integer brandId;
 
     @Column(nullable = false)
-    private String chainName;
+    private String brandName;
 
     @ManyToOne
-    @JoinColumn(name = "group_id", nullable = false)
-    private CustomerGroupEntity group;
+    @JoinColumn(name = "chain_id", nullable = false)
+    private ChainEntity chain;
 
     @Column(nullable = false)
     private boolean isActive = true;
@@ -31,43 +31,43 @@ public class ChainEntity {
     @PreUpdate
     public void onUpdate() { this.updatedAt = LocalDateTime.now(); }
 
-    // getters and setters
+    //Getters
 
-    public Integer getChainId() {
-        return chainId;
+    public Integer getBrandId() {
+        return brandId;
     }
 
-    public String getChainName() {
-        return chainName;
+    public String getBrandName() {
+        return brandName;
     }
 
-    public CustomerGroupEntity getGroup() {
-        return group;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public ChainEntity getChain() {
+        return chain;
     }
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    //Setters
 
-    public void setChainId(Integer chainId) {
-        this.chainId = chainId;
+    public void setBrandId(Integer brandId) {
+        this.brandId = brandId;
     }
 
-    public void setChainName(String chainName) {
-        this.chainName = chainName;
-    }
-
-    public void setGroup(CustomerGroupEntity group) {
-        this.group = group;
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
     }
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public void setChain(ChainEntity chain) {
+        this.chain = chain;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
