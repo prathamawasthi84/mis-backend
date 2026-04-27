@@ -1,6 +1,6 @@
-package com.example.MIS.and.Invoicing.System.groupmanagement.repository;
+package com.example.MIS.and.Invoicing.System.chainmanagement.repository;
 
-import com.example.MIS.and.Invoicing.System.groupmanagement.entity.ChainEntity;
+import com.example.MIS.and.Invoicing.System.chainmanagement.entity.ChainEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

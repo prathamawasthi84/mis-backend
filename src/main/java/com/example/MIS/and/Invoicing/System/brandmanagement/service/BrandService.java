@@ -1,10 +1,10 @@
-package com.example.MIS.and.Invoicing.System.groupmanagement.service;
+package com.example.MIS.and.Invoicing.System.brandmanagement.service;
 
-import com.example.MIS.and.Invoicing.System.groupmanagement.dto.BrandDTO;
-import com.example.MIS.and.Invoicing.System.groupmanagement.entity.BrandEntity;
-import com.example.MIS.and.Invoicing.System.groupmanagement.entity.ChainEntity;
-import com.example.MIS.and.Invoicing.System.groupmanagement.repository.BrandRepository;
-import com.example.MIS.and.Invoicing.System.groupmanagement.repository.ChainRepository;
+import com.example.MIS.and.Invoicing.System.brandmanagement.dto.BrandDTO;
+import com.example.MIS.and.Invoicing.System.brandmanagement.entity.BrandEntity;
+import com.example.MIS.and.Invoicing.System.chainmanagement.entity.ChainEntity;
+import com.example.MIS.and.Invoicing.System.brandmanagement.repository.BrandRepository;
+import com.example.MIS.and.Invoicing.System.chainmanagement.repository.ChainRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

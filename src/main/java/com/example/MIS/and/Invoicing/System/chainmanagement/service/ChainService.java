@@ -1,9 +1,9 @@
-package com.example.MIS.and.Invoicing.System.groupmanagement.service;
+package com.example.MIS.and.Invoicing.System.chainmanagement.service;
 
-import com.example.MIS.and.Invoicing.System.groupmanagement.dto.ChainDTO;
-import com.example.MIS.and.Invoicing.System.groupmanagement.entity.ChainEntity;
+import com.example.MIS.and.Invoicing.System.chainmanagement.dto.ChainDTO;
+import com.example.MIS.and.Invoicing.System.chainmanagement.entity.ChainEntity;
 import com.example.MIS.and.Invoicing.System.groupmanagement.entity.CustomerGroupEntity;
-import com.example.MIS.and.Invoicing.System.groupmanagement.repository.ChainRepository;
+import com.example.MIS.and.Invoicing.System.chainmanagement.repository.ChainRepository;
 import com.example.MIS.and.Invoicing.System.groupmanagement.repository.CustomerGroupRepository;
 import org.springframework.stereotype.Service;
 

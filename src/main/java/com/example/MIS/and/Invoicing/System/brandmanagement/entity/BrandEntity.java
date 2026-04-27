@@ -1,5 +1,6 @@
-package com.example.MIS.and.Invoicing.System.groupmanagement.entity;
+package com.example.MIS.and.Invoicing.System.brandmanagement.entity;
 
+import com.example.MIS.and.Invoicing.System.chainmanagement.entity.ChainEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

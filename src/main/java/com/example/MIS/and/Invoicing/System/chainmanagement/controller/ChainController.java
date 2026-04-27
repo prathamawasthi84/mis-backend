@@ -1,7 +1,7 @@
-package com.example.MIS.and.Invoicing.System.groupmanagement.controller;
+package com.example.MIS.and.Invoicing.System.chainmanagement.controller;
 
-import com.example.MIS.and.Invoicing.System.groupmanagement.dto.ChainDTO;
-import com.example.MIS.and.Invoicing.System.groupmanagement.service.ChainService;
+import com.example.MIS.and.Invoicing.System.chainmanagement.dto.ChainDTO;
+import com.example.MIS.and.Invoicing.System.chainmanagement.service.ChainService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

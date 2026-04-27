@@ -1,4 +1,4 @@
-package com.example.MIS.and.Invoicing.System.groupmanagement.dto;
+package com.example.MIS.and.Invoicing.System.brandmanagement.dto;
 
 public class BrandDTO {
     private String brandName;

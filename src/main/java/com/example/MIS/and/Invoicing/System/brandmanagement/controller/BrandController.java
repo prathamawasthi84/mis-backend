@@ -1,7 +1,7 @@
-package com.example.MIS.and.Invoicing.System.groupmanagement.controller;
+package com.example.MIS.and.Invoicing.System.brandmanagement.controller;
 
-import com.example.MIS.and.Invoicing.System.groupmanagement.dto.BrandDTO;
-import com.example.MIS.and.Invoicing.System.groupmanagement.service.BrandService;
+import com.example.MIS.and.Invoicing.System.brandmanagement.dto.BrandDTO;
+import com.example.MIS.and.Invoicing.System.brandmanagement.service.BrandService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
